@@ -8,7 +8,9 @@ namespace JSONForMe
 {
     class Dog
     {
-        public string Name { get; set; }
-        public int Legs { get; set; }
+        public string name { get; set; }
+        public int legs { get; set; }
+        //need to code for non basic types IE:
+        // Array, List, Dict, ect
     }
 }

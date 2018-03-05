@@ -11,17 +11,13 @@ using System.Reflection;
     {
         static void Main(string[] args)
         {
-            Dog Pupper = new Dog() { Name = "Woofer", Legs = 4 };
-            foreach (string thing in JSONCereal.GetPropNames(Pupper))
+            Dog Pupper = new Dog() { name = "Woofer", legs = 4 };
+            Console.WriteLine(JSONCereal.GetObjectName(Pupper));
+            foreach (PropertyInfo thing in JSONCereal.GetProps(Pupper))
             {
-                int i = 0;
-                Console.WriteLine(thing);
-                Console.WriteLine(JSONCereal.GetPropertyValue(Pupper, JSONCereal.GetPropName(JSONCereal.GetPropNames(Pupper), i)));
-                i++;
+                Console.WriteLine(thing.Name);
+                Console.WriteLine(JSONCereal.GetPropertyValue(Pupper, thing));
             }
-            //Console.WriteLine(JSONCereal.GetPropertyValue(Pupper, JSONCereal.GetPropName(JSONCereal.GetPropNames(Pupper), 0)));
-            //Console.WriteLine(JSONCereal.GetPropertyValue(Pupper, JSONCereal.GetNameFromList
-            //                 (JSONCereal.GetPropNames())));
             Console.ReadKey();
         }
     }

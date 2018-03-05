@@ -11,37 +11,43 @@ namespace JSONForMe
     {
         public static StringBuilder bobTheBuilder = new StringBuilder();
 
-        //gets the properties of an object into a string list
-        public static List<string> GetPropNames(object obj)
+        //gets the object name
+        public static string GetObjectName(object obj)
         {
-            List<string> tempStrList = new List<string>(obj.GetType().GetProperties().Count());
+            return obj.GetType().Name;
+        }
+
+        //gets the properties of an object into a string list
+        public static List<PropertyInfo> GetProps(object obj)
+        {
+            List<PropertyInfo> tempPropList = new List<PropertyInfo>();
             foreach (var thing in obj.GetType().GetProperties())
             {
-                tempStrList.Add(thing.Name);
+                tempPropList.Add(thing);
             }
-            return tempStrList;
+            return tempPropList;
+        }
+
+        // gets value from property
+        public static string GetPropertyValue(object obj, PropertyInfo property)
+        {
+            return property.GetValue(obj, null).ToString();
         }
 
         //gets strings from sting list
-        public static string GetNameFromList(List<string> strList)
-        {
-            for(int i =0; i < strList.Count; i++)
-            {
-                 bobTheBuilder.Append(GetPropName(strList, i));
-            }
-            return bobTheBuilder.ToString();
-        }
+        //public static string GetNameFromList(List<string> strList)
+        //{
+        //    for (int i = 0; i < strList.Count; i++)
+        //    {
+        //        bobTheBuilder.Append(GetPropName(strList, i));
+        //    }
+        //    return bobTheBuilder.ToString();
+        //}
 
         //gets individual names from list
-        public static string GetPropName(List<string> strList, int numb)
-        {
-            return strList[numb];
-        }
-        
-        // gets value from property
-        public static string GetPropertyValue(object obj, string property)
-        {
-            return obj.GetType().GetProperty(property).GetValue(obj, null).ToString();
-        }
+        //public static string GetPropName(List<string> strList, int numb)
+        //{
+        //    return strList[numb];
+        //}
     }
 }
