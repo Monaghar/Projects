@@ -10,7 +10,6 @@ namespace JSONForMe
     {
         public string name { get; set; }
         public int legs { get; set; }
-        //need to code for non basic types IE:
-        // Array, List, Dict, ect
+        public List<string> spots { get; set; }
     }
 }

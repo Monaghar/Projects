@@ -12,4 +12,6 @@ namespace JSONForMe
         public List<PropertyInfo> propertyInfo {get; set;}
         public List<string> inCase { get; set; }
     }
+
+    
 }
