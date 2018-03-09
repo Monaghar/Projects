@@ -12,6 +12,26 @@ namespace JSONForMe
     {
         public static StringBuilder bobTheBuilder = new StringBuilder();
 
+        public static void PrintToString(Dog Pupper)
+        {
+            Console.WriteLine(GetObjectName<Dog>());
+            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<Dog>())
+            {
+                Console.WriteLine(thing.Name);
+                if (!(JSONCereal.IsPropIenum(thing)))
+                {
+                    Console.WriteLine(JSONCereal.GetPropertyValue(Pupper, thing));
+                }
+                else
+                {
+                    foreach (string thiing in thing.GetValue(Pupper, null) as IList)
+                    {
+                        Console.WriteLine(thiing);
+                    }
+                }
+            }
+        }
+
         //gets the name of an object
         public static string GetObjectName<T>()
         {
@@ -24,12 +44,6 @@ namespace JSONForMe
             return typeof(T).GetProperties();
         }
 
-        //gets the properties of an object that are not enumerable
-        public static IEnumerable<PropertyInfo> GetPropertyInfoA(object obj)
-        {
-            return obj.GetType().GetProperties();
-        }
-
         // gets value from property
         public static string GetPropertyValue(object obj, PropertyInfo property)
         {
@@ -39,7 +53,7 @@ namespace JSONForMe
         public static string GetStringfromPropList(object obj, PropertyInfo property)
         {
             StringBuilder temp = new StringBuilder();
-            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfoA(obj))
+            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<object>())
             {
                 temp.Append(JSONCereal.GetPropertyValue(obj, thing));
             }
@@ -56,10 +70,16 @@ namespace JSONForMe
         }
 
         //find out if a property is IEnumerable
-        public static bool IsPropIenum(object obj, PropertyInfo property)
+        public static bool IsPropIenum(PropertyInfo property)
         {
             return (property.PropertyType.GetInterfaces().Contains(typeof(ICollection)));
         }
+
+        //gets the properties of an object that are not enumerable
+        //public static IEnumerable<PropertyInfo> GetPropertyInfoA(object obj)
+        //{
+        //    return obj.GetType().GetProperties();
+        //}
 
         //gets the object name
         //public static string GetObjectName(object obj)

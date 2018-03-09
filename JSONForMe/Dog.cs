@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace JSONForMe
 {
-    class Dog
+    public class Dog
     {
         public string name { get; set; }
         public int legs { get; set; }
