@@ -10,32 +10,58 @@ namespace JSONForMe
 {
     public static class JSONCereal
     {
-        public static StringBuilder bobTheBuilder = new StringBuilder();
 
-        public static void PrintToString(Dog Pupper)
+        public static string PrintToString<T>(T Pupper)
         {
-            Console.WriteLine(GetObjectName<Dog>());
-            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<Dog>())
+            StringBuilder bobTheBuilder = new StringBuilder();
+            bobTheBuilder.Append("{");
+            bobTheBuilder.Append("\""+typeof(T).Name+"\":");
+            bobTheBuilder.Append("{");
+            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<T>())
             {
-                Console.WriteLine(thing.Name);
+                bobTheBuilder.Append("\""+thing.Name+"\":");
                 if (!(JSONCereal.IsPropIenum(thing)))
                 {
-                    Console.WriteLine(JSONCereal.GetPropertyValue(Pupper, thing));
+                    try
+                    {
+                        int intTest = (int)thing.GetValue(Pupper, null);
+                        bobTheBuilder.Append((intTest).ToString()+',');
+                    }
+                    catch
+                    {
+                        bobTheBuilder.Append("\""+thing.GetValue(Pupper, null).ToString()+"\",");
+                    }
                 }
                 else
                 {
+                    bobTheBuilder.Append("[");
                     foreach (string thiing in thing.GetValue(Pupper, null) as IList)
-                    {
-                        Console.WriteLine(thiing);
+                    { // add in [] for array around things
+                        try
+                        {
+                            int intTest = Convert.ToInt32(thiing);
+                            bobTheBuilder.Append(intTest).ToString();
+                        }
+                        catch
+                        {
+                            bobTheBuilder.Append("\"" + thiing.ToString() + "\",");
+                        }
                     }
+                    bobTheBuilder.Append("]");
                 }
             }
+            bobTheBuilder.Append("}}");
+            return bobTheBuilder.ToString();
         }
 
-        //gets the name of an object
-        public static string GetObjectName<T>()
+        public static string AddQuotes(string input)
         {
-            return typeof(T).Name;
+            return "\"" + input + "\"";
+        }
+
+        public static string AddColon(string input)
+        {
+            return input + ":";
         }
 
         //gets the properties of an object into an IEnumerable
@@ -44,36 +70,33 @@ namespace JSONForMe
             return typeof(T).GetProperties();
         }
 
-        // gets value from property
-        public static string GetPropertyValue(object obj, PropertyInfo property)
-        {
-            return property.GetValue(obj, null).ToString();
-        }
-
-        public static string GetStringfromPropList(object obj, PropertyInfo property)
-        {
-            StringBuilder temp = new StringBuilder();
-            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<object>())
-            {
-                temp.Append(JSONCereal.GetPropertyValue(obj, thing));
-            }
-            return temp.ToString();
-        }
-
-        public static string GetStringfromIENUM(object obj, IEnumerable property)
-        {
-            foreach (PropertyInfo thing in property)
-            {
-                bobTheBuilder.Append(JSONCereal.GetPropertyValue(obj, thing));
-            }
-            return "wtf is life";
-        }
-
         //find out if a property is IEnumerable
         public static bool IsPropIenum(PropertyInfo property)
         {
             return (property.PropertyType.GetInterfaces().Contains(typeof(ICollection)));
         }
+
+        //gets the name of an object
+        //public static string GetObjectName<T>()
+        //{
+        //    return typeof(T).Name;
+        //}
+
+        // gets value from property
+        //public static string GetPropertyValue(object obj, PropertyInfo property)
+        //{
+        //    return property.GetValue(obj, null).ToString();
+        //}
+
+        //public static string GetStringfromPropList(object obj, PropertyInfo property)
+        //{
+        //    StringBuilder temp = new StringBuilder();
+        //    foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<object>())
+        //    {
+        //        temp.Append(thing.GetValue(obj, null));
+        //    }
+        //    return temp.ToString();
+        //}
 
         //gets the properties of an object that are not enumerable
         //public static IEnumerable<PropertyInfo> GetPropertyInfoA(object obj)
@@ -85,6 +108,15 @@ namespace JSONForMe
         //public static string GetObjectName(object obj)
         //{
         //    return obj.GetType().Name;
+        //}
+
+        //public static string GetStringfromIENUM(object obj, IEnumerable property)
+        //{
+        //    foreach (PropertyInfo thing in property)
+        //    {
+        //        bobTheBuilder.Append(thing.GetValue(obj, null));
+        //    }
+        //    return "wtf is life";
         //}
 
         //gets the properties of an object into a string list
