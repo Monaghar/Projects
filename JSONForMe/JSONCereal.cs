@@ -36,7 +36,7 @@ namespace JSONForMe
                 {
                     bobTheBuilder.Append("[");
                     foreach (string thiing in thing.GetValue(Pupper, null) as IList)
-                    { // add in [] for array around things
+                    { 
                         try
                         {
                             int intTest = Convert.ToInt32(thiing);
@@ -55,7 +55,7 @@ namespace JSONForMe
         }
 
         public static string AddQuotes(string input)
-        {
+        { 
             return "\"" + input + "\"";
         }
 
