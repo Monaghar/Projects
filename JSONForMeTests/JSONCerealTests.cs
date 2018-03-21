@@ -15,7 +15,7 @@ namespace JSONForMe.Tests
     {
         private string testString = "this is for testing";
         private Dog testPupper = new Dog() { name = "Woofer", legs = 4, spots = new List<string>() { "L", "O", "3" } };
-
+        
         [TestMethod()]
         public void PrintToStringTest()
         {
@@ -33,29 +33,20 @@ namespace JSONForMe.Tests
         {
             Assert.AreEqual(JSONCereal.AddColon(testString), testString + ":");
         }
-        //seperate the testing of each property
+
         [TestMethod()]
         public void GetPropertyInfoTest()
         {
-            IEnumerable<PropertyInfo> testProp = typeof(Dog).GetProperties();
-            foreach (var testThing in testProp)
-            {
-                Assert.IsTrue(testThing is PropertyInfo);
-            }
+            var testProp = typeof(Dog).GetProperties();
+            Assert.IsNotNull(testProp);
+            Assert.IsTrue(testProp is IEnumerable<PropertyInfo>);
         }
         //seperate the testing of each property
         [TestMethod()]
         public void IsPropIenumTest()
         {
-            IEnumerable<PropertyInfo> testProp = typeof(Dog).GetProperties();
-            for(int i = 0; i < testProp.Count(); i++)
-            {
-                var tempVal = testProp.ElementAt(i);
-                if(tempVal is ICollection)
-                {
-                    Assert.IsTrue(true);
-                }
-            }
+            var testProp = typeof(Dog).GetProperties();
+            Assert.IsTrue(JSONCereal.IsPropIenum(testProp[2]));
         }
     }
 }

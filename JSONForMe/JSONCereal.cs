@@ -10,42 +10,25 @@ namespace JSONForMe
 {
     public static class JSONCereal
     {
-
-        public static string PrintToString<T>(T Pupper)
+        //delte the last comma in a non enum property
+        public static string PrintToJSON<T>(T Pupper)
         {
             StringBuilder bobTheBuilder = new StringBuilder();
             bobTheBuilder.Append("{");
-            bobTheBuilder.Append("\""+typeof(T).Name+"\":");
-            bobTheBuilder.Append("{");
+            bobTheBuilder.Append(JSONObject(typeof(T).Name));
             foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<T>())
             {
-                bobTheBuilder.Append("\""+thing.Name+"\":");
+                bobTheBuilder.Append(JSONKey(thing));
                 if (!(JSONCereal.IsPropIenum(thing)))
                 {
-                    try
-                    {
-                        int intTest = (int)thing.GetValue(Pupper, null);
-                        bobTheBuilder.Append((intTest).ToString()+',');
-                    }
-                    catch
-                    {
-                        bobTheBuilder.Append("\""+thing.GetValue(Pupper, null).ToString()+"\",");
-                    }
+                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
                 }
                 else
                 {
                     bobTheBuilder.Append("[");
                     foreach (string thiing in thing.GetValue(Pupper, null) as IList)
-                    { 
-                        try
-                        {
-                            int intTest = Convert.ToInt32(thiing);
-                            bobTheBuilder.Append(intTest).ToString();
-                        }
-                        catch
-                        {
-                            bobTheBuilder.Append("\"" + thiing.ToString() + "\",");
-                        }
+                    {
+                        bobTheBuilder.Append(JSONTryValue(thiing));
                     }
                     bobTheBuilder.Append("]");
                 }
@@ -64,6 +47,45 @@ namespace JSONForMe
             return input + ":";
         }
 
+        public static string AddComma(string input)
+        {
+            return input + ",";
+        }
+
+        public static string JSONKey(PropertyInfo input)
+        {
+            return AddColon(AddQuotes(input.Name));
+        }
+
+        public static string JSONObject(string input)
+        {
+            return AddColon(AddQuotes(input)) + "{";
+        }
+
+        public static string JSONValue(string input)
+        {
+                return AddComma(AddQuotes(input));
+        }
+
+        public static string JSONValue(int input)
+        {
+            return AddComma(input.ToString());
+        }
+
+        public static string JSONTryValue(string input)
+        {
+            try
+            {
+                int intTest = Convert.ToInt32(input);
+                return (JSONValue(intTest).ToString());
+            }
+            catch
+            {
+                return (JSONValue(input));
+            }
+        }
+
+
         //gets the properties of an object into an IEnumerable
         public static IEnumerable<PropertyInfo> GetPropertyInfo<T>()
         {
@@ -74,19 +96,8 @@ namespace JSONForMe
         public static bool IsPropIenum(PropertyInfo property)
         {
             return (property.PropertyType.GetInterfaces().Contains(typeof(ICollection)));
+     
         }
-
-        //gets the name of an object
-        //public static string GetObjectName<T>()
-        //{
-        //    return typeof(T).Name;
-        //}
-
-        // gets value from property
-        //public static string GetPropertyValue(object obj, PropertyInfo property)
-        //{
-        //    return property.GetValue(obj, null).ToString();
-        //}
 
         //public static string GetStringfromPropList(object obj, PropertyInfo property)
         //{
@@ -138,12 +149,6 @@ namespace JSONForMe
         //        bobTheBuilder.Append(GetPropName(strList, i));
         //    }
         //    return bobTheBuilder.ToString();
-        //}
-
-        //gets individual names from list
-        //public static string GetPropName(List<string> strList, int numb)
-        //{
-        //    return strList[numb];
         //}
     }
 }

@@ -13,7 +13,7 @@ using System.Reflection;
         static void Main(string[] args)
         {
             Dog Pupper = new Dog() { name = "Woofer", legs = 4, spots = new List<string>(){ "L", "O", "3" } };
-            Console.WriteLine(JSONCereal.PrintToString(Pupper));
+            Console.WriteLine(JSONCereal.PrintToJSON(Pupper));
             Console.ReadKey();
         }
     }
