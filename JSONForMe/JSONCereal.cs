@@ -19,20 +19,25 @@ namespace JSONForMe
             foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<T>())
             {
                 bobTheBuilder.Append(JSONKey(thing));
-                if (!(JSONCereal.IsPropIenum(thing)))
-                {
-                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
-                }
-                else
+                if (JSONCereal.IsPropIenum(thing))
                 {
                     bobTheBuilder.Append("[");
                     foreach (string thiing in thing.GetValue(Pupper, null) as IList)
                     {
                         bobTheBuilder.Append(JSONTryValue(thiing));
                     }
-                    bobTheBuilder.Append("]");
+                    string tempString = TrimItem(bobTheBuilder.ToString());
+                    bobTheBuilder.Clear();
+                    bobTheBuilder.Append(tempString + "],");
                 }
+                //if(thing is another type like object, or enum(don't know how json does this) or ect. call print to JSON on it?)
+                else
+                {
+                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                }
+                TrimItem(bobTheBuilder.ToString());
             }
+            TrimItem(bobTheBuilder.ToString());
             bobTheBuilder.Append("}}");
             return bobTheBuilder.ToString();
         }
@@ -97,6 +102,15 @@ namespace JSONForMe
         {
             return (property.PropertyType.GetInterfaces().Contains(typeof(ICollection)));
      
+        }
+
+        public static string TrimItem(string input)
+        {
+            if (input.EndsWith(","))
+            {
+                return input.Remove(input.Length - 1, 1);
+            }
+            return input;
         }
 
         //public static string GetStringfromPropList(object obj, PropertyInfo property)

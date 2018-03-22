@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace JSONForMe
 {
-    public class Dog
+    public class Puppy 
     {
         public string name { get; set; }
         public int legs { get; set; }
         public List<string> spots { get; set; }
-        public Puppy dogiee { get; set; }
     }
 }
