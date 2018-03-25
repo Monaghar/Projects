@@ -10,6 +10,7 @@ namespace JSONForMe
     {
         public string name { get; set; }
         public int legs { get; set; }
+        public bool isParent { get; set; }
         public List<string> spots { get; set; }
     }
 }

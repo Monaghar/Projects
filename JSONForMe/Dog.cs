@@ -11,6 +11,7 @@ namespace JSONForMe
         public string name { get; set; }
         public int legs { get; set; }
         public List<string> spots { get; set; }
+        public bool isParent { get; set; }
         public Puppy dogiee { get; set; }
     }
 }

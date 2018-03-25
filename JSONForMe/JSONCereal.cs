@@ -11,15 +11,16 @@ namespace JSONForMe
     public static class JSONCereal
     {
         //delte the last comma in a non enum property
+        //the else clause at the end pulls thing as a method info? not as the propertytype of thing which should be Puppy, 
         public static string PrintToJSON<T>(T Pupper)
         {
             StringBuilder bobTheBuilder = new StringBuilder();
             bobTheBuilder.Append("{");
             bobTheBuilder.Append(JSONObject(typeof(T).Name));
-            foreach (PropertyInfo thing in JSONCereal.GetPropertyInfo<T>())
+            foreach (PropertyInfo thing in GetPropertyInfo<T>())
             {
                 bobTheBuilder.Append(JSONKey(thing));
-                if (JSONCereal.IsPropIenum(thing))
+                if (IsPropIenum(thing))
                 {
                     bobTheBuilder.Append("[");
                     foreach (string thiing in thing.GetValue(Pupper, null) as IList)
@@ -31,9 +32,22 @@ namespace JSONForMe
                     bobTheBuilder.Append(tempString + "],");
                 }
                 //if(thing is another type like object, or enum(don't know how json does this) or ect. call print to JSON on it?)
-                else
+                else if(thing.PropertyType.IsPrimitive)
                 {
                     bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                }
+                else if(thing.PropertyType == typeof(string))
+                {
+                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                }
+                else
+                {
+                    //var NMI = MethodInfo.MakeGenericMethod(thing.PropertyType);
+                    //NMI.Invoke(null, thing.GetValue(Pupper.));
+                    //thing.PropertyType.MakeGenericType();
+                    // var test = thing.PropertyType;
+                    //var typr = (test.GetType());
+                    //PrintToJSON(thing.PropertyType);
                 }
                 TrimItem(bobTheBuilder.ToString());
             }
@@ -77,17 +91,28 @@ namespace JSONForMe
             return AddComma(input.ToString());
         }
 
+        public static string JSONValue(bool input)
+        {
+            return AddComma(input.ToString());
+        }
+
         public static string JSONTryValue(string input)
         {
-            try
+            int intValue;
+            bool boolValue;
+            if(Int32.TryParse(input, out intValue))
             {
-                int intTest = Convert.ToInt32(input);
-                return (JSONValue(intTest).ToString());
+                return (JSONValue(intValue).ToString());
             }
-            catch
+            if (bool.TryParse(input, out boolValue))
+            {
+                return (JSONValue(boolValue).ToString());
+            }
+            else
             {
                 return (JSONValue(input));
             }
+            
         }
 
 
