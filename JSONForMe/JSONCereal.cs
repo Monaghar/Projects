@@ -42,18 +42,65 @@ namespace JSONForMe
                 }
                 else
                 {
-                    //var NMI = MethodInfo.MakeGenericMethod(thing.PropertyType);
-                    //NMI.Invoke(null, thing.GetValue(Pupper.));
-                    //thing.PropertyType.MakeGenericType();
-                    // var test = thing.PropertyType;
-                    //var typr = (test.GetType());
-                    //PrintToJSON(thing.PropertyType);
+                    bobTheBuilder.Append(AppendToJSON(thing.ConvertPropInfoToObject(Pupper)));
                 }
                 TrimItem(bobTheBuilder.ToString());
             }
             TrimItem(bobTheBuilder.ToString());
             bobTheBuilder.Append("}}");
             return bobTheBuilder.ToString();
+        }
+
+        public static string AppendToJSON<T>(T Pupper)
+        {
+            StringBuilder bobTheBuilder = new StringBuilder();
+            bobTheBuilder.Append("{");
+            bobTheBuilder.Append(JSONObject(typeof(T).Name));
+            foreach (PropertyInfo thing in GetPropertyInfo<T>())
+            {
+                bobTheBuilder.Append(JSONKey(thing));
+                if (IsPropIenum(thing))
+                {
+                    bobTheBuilder.Append("[");
+                    foreach (string thiing in thing.GetValue(Pupper, null) as IList)
+                    {
+                        bobTheBuilder.Append(JSONTryValue(thiing));
+                    }
+                    string tempString = TrimItem(bobTheBuilder.ToString());
+                    bobTheBuilder.Clear();
+                    bobTheBuilder.Append(tempString + "],");
+                }
+                //if(thing is another type like object, or enum(don't know how json does this) or ect. call print to JSON on it?)
+                else if (thing.PropertyType.IsPrimitive)
+                {
+                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                }
+                else if (thing.PropertyType == typeof(string))
+                {
+                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                }
+                else
+                {
+                    bobTheBuilder.Append(AppendToJSON(thing.ConvertPropInfoToObject(Pupper)));
+                }
+                TrimItem(bobTheBuilder.ToString());
+            }
+            TrimItem(bobTheBuilder.ToString());
+            bobTheBuilder.Append("}}");
+            return bobTheBuilder.ToString();
+        }
+
+        public static  object ConvertPropInfoToObject(this PropertyInfo propertyInfo, object parent)
+        {
+            var source = propertyInfo.GetValue(parent, null);
+            var destination = Activator.CreateInstance(propertyInfo.PropertyType);
+            foreach (PropertyInfo prop in destination.GetType().GetProperties().ToList())
+            {
+                var value = source.GetType().GetProperty(prop.Name).GetValue(source, null);
+                prop.SetValue(destination, value, null);
+            }
+            
+            return destination;
         }
 
         public static string AddQuotes(string input)
@@ -114,7 +161,6 @@ namespace JSONForMe
             }
             
         }
-
 
         //gets the properties of an object into an IEnumerable
         public static IEnumerable<PropertyInfo> GetPropertyInfo<T>()
