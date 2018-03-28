@@ -17,13 +17,13 @@ namespace JSONForMe
             StringBuilder bobTheBuilder = new StringBuilder();
             bobTheBuilder.Append("{");
             bobTheBuilder.Append(JSONObject(typeof(T).Name));
-            foreach (PropertyInfo thing in GetPropertyInfo<T>())
+            foreach (PropertyInfo propertyInfo in GetPropertyInfo<T>())
             {
-                bobTheBuilder.Append(JSONKey(thing));
-                if (IsPropIenum(thing))
+                bobTheBuilder.Append(JSONKey(propertyInfo));
+                if (IsPropIenum(propertyInfo))
                 {
                     bobTheBuilder.Append("[");
-                    foreach (string thiing in thing.GetValue(Pupper, null) as IList)
+                    foreach (string thiing in propertyInfo.GetValue(Pupper, null) as IList)
                     {
                         bobTheBuilder.Append(JSONTryValue(thiing));
                     }
@@ -31,18 +31,18 @@ namespace JSONForMe
                     bobTheBuilder.Clear();
                     bobTheBuilder.Append(tempString + "],");
                 }
-                //if(thing is another type like object, or enum(don't know how json does this) or ect. call print to JSON on it?)
-                else if(thing.PropertyType.IsPrimitive)
+                else if(propertyInfo.PropertyType.IsPrimitive)
                 {
-                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                    bobTheBuilder.Append(JSONTryValue(propertyInfo.GetValue(Pupper, null).ToString()));
                 }
-                else if(thing.PropertyType == typeof(string))
+                else if(propertyInfo.PropertyType == typeof(string))
                 {
-                    bobTheBuilder.Append(JSONTryValue(thing.GetValue(Pupper, null).ToString()));
+                    bobTheBuilder.Append(JSONTryValue(propertyInfo.GetValue(Pupper, null).ToString()));
                 }
                 else
                 {
-                    bobTheBuilder.Append(AppendToJSON(thing.ConvertPropInfoToObject(Pupper)));
+
+                    bobTheBuilder.Append(AppendToJSON(propertyInfo.ConvertPropInfoToObject(Pupper)));
                 }
                 TrimItem(bobTheBuilder.ToString());
             }
@@ -90,16 +90,20 @@ namespace JSONForMe
             return bobTheBuilder.ToString();
         }
 
-        public static  object ConvertPropInfoToObject(this PropertyInfo propertyInfo, object parent)
+        public static dynamic ConvertPropInfoToObject(this PropertyInfo propertyInfo, object parent)
         {
+            var typer = propertyInfo.PropertyType;
+            var typeName = typer.FullName;
+            Assembly execAsm = Assembly.GetExecutingAssembly();
+            object instance = AppDomain.CurrentDomain.CreateInstanceAndUnwrap(execAsm.FullName, typeName);
+            
             var source = propertyInfo.GetValue(parent, null);
-            var destination = Activator.CreateInstance(propertyInfo.PropertyType);
-            foreach (PropertyInfo prop in destination.GetType().GetProperties().ToList())
+            dynamic destination = Activator.CreateInstance(propertyInfo.PropertyType);
+            foreach (PropertyInfo prop in destination.GetType().GetProperties())
             {
                 var value = source.GetType().GetProperty(prop.Name).GetValue(source, null);
                 prop.SetValue(destination, value, null);
             }
-            
             return destination;
         }
 
