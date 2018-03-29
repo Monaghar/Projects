@@ -42,7 +42,7 @@ namespace JSONForMe
                 else
                 {
 
-                    bobTheBuilder.Append(AppendToJSON(propertyInfo.ConvertPropInfoToObject(Pupper)));
+                    bobTheBuilder.Append(ConvertPropInfoToObject(propertyInfo, Pupper));
                 }
                 TrimItem(bobTheBuilder.ToString());
             }
@@ -81,7 +81,7 @@ namespace JSONForMe
                 }
                 else
                 {
-                    bobTheBuilder.Append(AppendToJSON(thing.ConvertPropInfoToObject(Pupper)));
+                    bobTheBuilder.Append(AppendToJSON(ConvertPropInfoToObject(thing, Pupper)));
                 }
                 TrimItem(bobTheBuilder.ToString());
             }
@@ -90,13 +90,17 @@ namespace JSONForMe
             return bobTheBuilder.ToString();
         }
 
-        public static dynamic ConvertPropInfoToObject(this PropertyInfo propertyInfo, object parent)
+        public static string ConvertPropInfoToObject(PropertyInfo propertyInfo, object parent)
         {
-            var typer = propertyInfo.PropertyType;
-            var typeName = typer.FullName;
-            Assembly execAsm = Assembly.GetExecutingAssembly();
-            object instance = AppDomain.CurrentDomain.CreateInstanceAndUnwrap(execAsm.FullName, typeName);
-            
+            var mi = typeof(JSONCereal).GetMethod("AppendToJSON");
+            Console.WriteLine(propertyInfo.PropertyType.Name);
+            var miMyDTO2 = mi.MakeGenericMethod(propertyInfo.PropertyType);
+            //Console.WriteLine(miMyDTO2.Invoke(null, new object[] { propertyInfo.GetValue(parent) }));
+            return AppendToJSON(miMyDTO2.Invoke(null, new object[] { propertyInfo.GetValue(parent) }));
+        }
+
+        public static dynamic ConvertPropInfoToDynamic(PropertyInfo propertyInfo, object parent)
+        {   
             var source = propertyInfo.GetValue(parent, null);
             dynamic destination = Activator.CreateInstance(propertyInfo.PropertyType);
             foreach (PropertyInfo prop in destination.GetType().GetProperties())
